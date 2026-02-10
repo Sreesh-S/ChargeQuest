@@ -1,0 +1,87 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(content="width=device-width, initial-scale=1" name="viewport")
+        title ChargeQuest - Admin Dashboard
+        link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+        link(rel="stylesheet" 
+            href="/fonts/fonts.css")
+        link(rel="stylesheet" 
+            href="/fonts/materialdesignicons.min.css")
+        link(rel="stylesheet" 
+            href="/FA4/css/font-awesome.min.css")
+        link(rel="stylesheet" 
+            href="/custom/css/common.css")
+        link(rel="stylesheet" 
+            href="/custom/css/admin_users.css")
+    body.position-relative
+        span#resp.hidden= resp
+        span#users.hidden= userlist
+
+        include include/bs5_modals.pug
+        include include/admin_navbar.pug
+
+        form#frmChangeStatus(method="post" action="/admin/users" onsubmit="return ValidateChangeStatus();")
+            input#hdnCSUserID(type="hidden" name="userid")
+            #ChangeStatusModal.modal(tabindex="-1")
+                .modal-dialog
+                    .modal-content
+                        .modal-header
+                            h5.modal-title Change Status
+                            button.btn-close(aria-label="Close" data-bs-dismiss="modal" type="button")
+                        .modal-body
+                            .form-group.mt-5.mb-3 
+                                label.form-label(for="tbFullName") Full name
+                                input#tbCSFullName.form-control(type="text" name="fullname" readonly="")
+                            .form-group.mb-3 
+                                label.form-label(for="ddStatus") Status 
+                                select#ddCSStatus.form-select(name="status")
+                                    option(value='-1') --Select Status--
+                                    option(value='active') Active 
+                                    option(value='inactive') Inactive 
+                                    option(value='suspended') Suspended
+                                .invalid-feedback Select a status!
+                        .modal-footer
+                            button.btn.btn-secondary(data-bs-dismiss="modal" type="button") Close
+                            button.btn.btn-primary(type="submit" name="submit_chstatus") Save changes
+        
+        form#frmDeleteUser(method="post" action="/admin/users" onsubmit="return ValidateDelete();")
+            input#hdnDelUserID(type="hidden" name="userid")
+            #DeleteUserModal.modal(tabindex="-1")
+                .modal-dialog
+                    .modal-content
+                        .modal-header
+                            h5.modal-title Delete User
+                            button.btn-close(aria-label="Close" data-bs-dismiss="modal" type="button")
+                        .modal-body
+                            p Are you sure ....
+                        .modal-footer
+                            button.btn.btn-secondary(data-bs-dismiss="modal" type="button") Close
+                            button.btn.btn-danger(type="submit" name="submit_del") Delete
+
+        .container 
+            .row 
+                .col-12 
+                    #userListCard.card.mt-5 
+                        .card-body 
+                            h3 User List
+                            table#tblUserList.table.table-striped.table-hover.mt-4
+                                thead 
+                                    tr 
+                                        th #
+                                        th Fullname 
+                                        th E-mail
+                                        th Mobile 
+                                        th Address 
+                                        th City 
+                                        th Status 
+                                        th Actions 
+                                tbody 
+
+        include include/footer.pug
+        
+        script(src="/bootstrap/js/bootstrap.bundle.min.js")
+        script(src="/jquery/jquery.min.js")
+        script(src="/custom/js/bs5_modals.js")
+        script(src="/custom/js/admin_users.js")

@@ -1,0 +1,72 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(content="width=device-width, initial-scale=1" name="viewport")
+        title ChargeQuest - Vehicles
+        link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+        link(rel="stylesheet" 
+            href="/fonts/fonts.css")
+        link(rel="stylesheet" 
+            href="/fonts/materialdesignicons.min.css")
+        link(rel="stylesheet" 
+            href="/FA4/css/font-awesome.min.css")
+        link(rel="stylesheet" 
+            href="/custom/css/common.css")
+
+
+    body.position-relative
+        span#resp.hidden= resp
+        span#cslist.hidden= cslist
+
+        include include/bs5_modals.pug
+        include include/user_navbar.pug
+
+        form#frmAdd(method="post" action="/user/vehicles" onsubmit="return ValidateAdd();")
+            #AddModal.modal(tabindex="-1")
+                .modal-dialog
+                    .modal-content
+                        .modal-header
+                            h5.modal-title Add Vehicle
+                            button.btn-close(aria-label="Close" data-bs-dismiss="modal" type="button")
+                        .modal-body
+                            .form-group.mt-2
+                                label.form-label(for="tbComp") Company
+                                input#tbComp.form-control(type="text" name="comp")
+                                .invalid-feedback Company is required! 
+                            .form-group.mt-2
+                                label.form-label(for="tbModel") Model 
+                                input#tbModel.form-control(type="text" name="model")
+                                .invalid-feedback Model is required! 
+                            .form-group.mt-2 
+                                label.form-label(for="ddChargeType")
+                                select#ddChargeType.form-select(name="ctid")
+                                .invalid-feedback Charger type is required!
+                        .modal-footer
+                            button.btn.btn-secondary(data-bs-dismiss="modal" type="button") Close
+                            button.btn.btn-primary(type="submit" name="submit_add") Add
+
+        .container 
+            .row 
+                .col-12
+                    .card.mt-5 
+                        .card-body 
+                            h4 My Vehicles
+                            button#btnTriggerAddModal.btn.btn-success(type="button") Add Vehicle
+                            table#tblVehicles.table.table-striped.table-hover
+                                thead   
+                                    tr 
+                                        th #
+                                        th Company
+                                        th Model
+                                        th Charger type
+                                        th Actions
+                                tbody
+                                    
+
+        include include/footer.pug
+
+        script(src="/bootstrap/js/bootstrap.bundle.min.js")
+        script(src="/jquery/jquery.min.js")
+        script(src="/custom/js/bs5_modals.js")
+        script(src="/custom/js/user_vehicles.js")

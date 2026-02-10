@@ -1,0 +1,52 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(content="width=device-width, initial-scale=1" 
+            name="viewport")
+        title ChargeQuest - user Login
+        link(rel="stylesheet" 
+            href="/bootstrap/css/bootstrap.min.css")
+        link(rel="stylesheet" 
+            href="/fonts/fonts.css")
+        link(rel="stylesheet" 
+            href="/fonts/materialdesignicons.min.css")
+        link(rel="stylesheet" 
+            href="/custom/css/common.css")
+        link(rel="stylesheet" 
+            href="/custom/css/user_login.css")
+    body
+        span#resp.hidden= resp
+        .container
+            .row 
+                .col-lg-4.col-md-4.col-sm-12.col-xs-12.offset-lg-4.offset-md-4
+                    form#frmLogin(method="post" action="/user/login" onsubmit="return ValidateLogin();")
+                        h2.text-center 
+                            b ChargeQuest
+                            br 
+                            | User Login
+                        .card.mt-3 
+                            .card-body 
+                                h4 Enter Login Credentials 
+                                .form-group.mt-5.mb-3 
+                                    label.form-label(for="tbLogin") Login ID
+                                    input#tbLogin(type="email" name="login" class="form-control")
+                                    .invalid-feedback Email ID is required!
+                                .form-group.mb-3 
+                                    label.form-label(for="tbPasswd") Password
+                                    input#tbPasswd(type="password" name="passwd" class="form-control")
+                                    .invalid-feedback Password is required! 
+                                .form-group.mt-5 
+                                    button.btn.btn-primary.btn-lg.w-100.mt-5(type="submit" name="submit_login") 
+                                        span.mdi.mdi-login 
+                                        | Login
+                                .form-group.mt-2
+                                    a.btn.btn-outline-primary.btn-sm.w-100(href="/user/signup") Go to signup
+       
+
+                                        
+
+                                
+        script(src="/bootstrap/js/bootstrap.bundle.min.js")
+        script(src="/jquery/jquery.min.js")
+        script(src="/custom/js/user_login.js")

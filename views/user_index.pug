@@ -1,0 +1,80 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(content="width=device-width, initial-scale=1" name="viewport")
+        title ChargeQuest - Home
+        link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+        link(rel="stylesheet" 
+            href="/fonts/fonts.css")
+        link(rel="stylesheet" 
+            href="/fonts/materialdesignicons.min.css")
+        link(rel="stylesheet" 
+            href="/FA4/css/font-awesome.min.css")
+        link(rel="stylesheet" 
+            href="/custom/css/common.css")
+        script(async="" defer="" src="https://apis.mappls.com/advancedmaps/api/41f389716b70ccd9d515800dc7e9e69b/map_sdk?layer=vector&v=3.0&callback=initMap1")
+
+    body.position-relative
+        span#resp.hidden= resp
+        span#cslist.hidden= cslist
+
+        include include/bs5_modals.pug
+        include include/user_navbar.pug
+
+        #LocPickerModal.modal(tabindex="-1")
+            input#hdnLocInfo(type="hidden" name="locinfo")
+            .modal-dialog
+                .modal-content
+                    .modal-header
+                        h5.modal-title Location Picker
+                        button.btn-close(aria-label="Close" data-bs-dismiss="modal" type="button")
+                    .modal-body
+                        #map
+                    .modal-footer
+                        button.btn.btn-primary(data-bs-dismiss="modal" type="button") Select
+
+        .container 
+            .row 
+                .col-lg-4.col-md-4.col-sm-12.col-xs-12 
+                    form#frmAdd(method="post" action="/admin/cstations" onsubmit="return ValidateAdd();")
+                        input#hdnLoc(type="hidden" name="loc")
+                        .card.mt-5 
+                            .card-body 
+                                h4 Welcome
+                                    span#lblUserName &nbsp;
+                                .input-group.mt-5
+                                    label.form-label(for="tbLoc")
+                                    input#tbLoc.form-control(type="text" name="loc")
+                                    button#btnTriggerLocationSelect.btn.btn-outline-secondary(type="button") Location
+
+                                .form-group.mb-3 
+                                    label.form-label(for="ddVehicle") Select vehicle
+                                    select#ddVehicles.form-select(name="vid")
+                                        option Tata Tiago EV                                     
+                                    .invalid-feedback Car is required! 
+                                
+                                .form-group.mt-5 
+                                    button#btnSearch.btn.btn-primary.btn-lg.float-end(type="button") Search
+
+                .col-lg-8.col-md-8.col-sm-12.col-xs-12 
+                    .card.mt-5 
+                        .card-body 
+                            h4 Search result(s)
+                            table#tblSearchRes.table.table-striped.table-hover
+                                thead   
+                                    tr 
+                                        th #
+                                        th Name 
+                                        th Location 
+                                        th Distance
+                                        th Status 
+                                tbody
+                                    
+
+        include include/footer.pug
+
+        script(src="/bootstrap/js/bootstrap.bundle.min.js")
+        script(src="/jquery/jquery.min.js")
+        script(src="/custom/js/bs5_modals.js")
+        script(src="/custom/js/user_index.js")

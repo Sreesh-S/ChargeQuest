@@ -1,0 +1,29 @@
+nav.navbar.navbar-expand-lg.bg-body-tertiary
+    .container
+        a.navbar-brand(href="/admin/index") 
+            img(src="/media/applogo.svg")
+            b ChargeQuest
+            sup Admin Dashboard
+        button.navbar-toggler(aria-label="Toggle navigation" aria-expanded="false" aria-controls="navbarSupportedContent" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button")
+            span.navbar-toggler-icon
+        #navbarSupportedContent.collapse.navbar-collapse
+            ul.navbar-nav.ms-auto.mb-2.mb-lg-0
+                li.nav-item
+                    a.nav-link.active(href="/admin/index" aria-current="page") Home
+                li.nav-item
+                    a.nav-link(href="/admin/users") Users                    
+                li.nav-item
+                    a.nav-link(href="/admin/cstations") Charging Stations
+                li.nav-item
+                    a.nav-link(href="/admin/cports") Charging Ports
+                li.nav-item
+                    a.nav-link(href="/admin/ctypes") Charger Types
+                li.nav-item.dropdown
+                    a.nav-link.dropdown-toggle(aria-expanded="false" data-bs-toggle="dropdown" role="button" href="#") Site Admin
+                    ul.dropdown-menu
+                        li
+                            a.dropdown-item(href="#") Account Settings
+                        li
+                            hr.dropdown-divider
+                        li
+                            a.dropdown-item(href="/admin/logout") Logout

@@ -1,0 +1,15 @@
+#tblCSList tbody {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+#tblCSList tbody .btn {
+    width: 160px;
+}
+
+#map {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 500px;
+}

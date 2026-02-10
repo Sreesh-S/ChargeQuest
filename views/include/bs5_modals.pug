@@ -1,0 +1,21 @@
+#MessageModal.modal(tabindex='-1')
+    .modal-dialog
+        .modal-content
+        .modal-header(style="background-color: #e7e7e7;")
+            h5.modal-title Message Caption
+            button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+        .modal-body(style="background-color: #e7e7e7;")
+            p Message Content
+        .modal-footer(style="background-color: #e7e7e7;")
+            button#btnMsgModalClose.btn.btn-primary(type='button' data-bs-dismiss='modal') Close
+
+#ErrorBoxModal.modal(tabindex='-1')
+    .modal-dialog
+        .modal-content
+        .modal-header.bg-danger
+            h5.modal-title Message Caption
+            button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+        .modal-body(style="background-color: #e7e7e7;")
+            p Message Content
+        .modal-footer(style="background-color: #e7e7e7;")
+            button#btnErrorModalClose.btn.btn-danger(type='button' data-bs-dismiss='modal') Close

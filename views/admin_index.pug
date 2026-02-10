@@ -1,0 +1,42 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(content="width=device-width, initial-scale=1" name="viewport")
+        title ChargeQuest - Admin Dashboard
+        link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+        link(rel="stylesheet" 
+            href="/fonts/fonts.css")
+        link(rel="stylesheet" 
+            href="/fonts/materialdesignicons.min.css")
+        link(rel="stylesheet" 
+            href="/FA4/css/font-awesome.min.css")
+        link(rel="stylesheet" 
+            href="/custom/css/common.css")
+        link(rel="stylesheet" 
+            href="/custom/css/admin_index.css")
+    body.position-relative
+        span#resp.hidden= resp
+
+        include include/admin_navbar.pug
+
+        .container 
+            .row 
+                .col-lg-6 
+                    .card.bg-success.text-white.mt-5
+                        .card-body 
+                            h1 3
+                            h5 Users
+                            button.btn.btn-light.w-100.mt-5 View
+                .col-lg-6 
+                    .card.bg-danger.text-white.mt-5
+                        .card-body 
+                            h1 3
+                            h5 Charging stations
+                            button.btn.btn-light.w-100.mt-5 View
+
+        include include/footer.pug
+        
+        script(src="/bootstrap/js/bootstrap.bundle.min.js")
+        script(src="/jquery/jquery.min.js")
+        script(src="/custom/js/admin_index.js")

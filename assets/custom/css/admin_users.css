@@ -1,0 +1,8 @@
+#userListCard .card-body {
+    max-height: 720px;
+    overflow-y: auto;
+}
+
+#tblUserList tbody button {
+    width: 140px;
+}

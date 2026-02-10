@@ -1,0 +1,12 @@
+body {
+    background-image: url('/media/admin_login_bkg.jpg');
+    background-size: cover;
+}
+
+#frmLogin {
+    margin-top: 20%;
+}
+
+#frmLogin h2 {
+    color: #fff;
+}
