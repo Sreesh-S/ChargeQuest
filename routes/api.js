@@ -15,5 +15,13 @@ apiRouter.post('/cport', apictl.getCPort);
 apiRouter.post('/allctypes', apictl.getAllCTypes);
 apiRouter.post('/alluservehicles', apictl.getAllUserVehicles);
 apiRouter.post('/search', apictl.search);
+apiRouter.post('/getwallet', apictl.getWallet);
+apiRouter.post('/rechargewallet', apictl.rechargeWallet);
+apiRouter.post('/getbookings', apictl.getBookings);
+apiRouter.post('/addbooking', apictl.addBooking);
+apiRouter.post('/cancelbooking', apictl.cancelBooking);
+apiRouter.post('/startsession', apictl.startChargingSession);
+apiRouter.post('/stopsession', apictl.stopChargingSession);
+apiRouter.post('/activesession', apictl.getActiveSession);
 
 module.exports = apiRouter; 

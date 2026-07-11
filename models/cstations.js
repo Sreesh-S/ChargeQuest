@@ -71,7 +71,7 @@ const search = async (ctid) => {
             host: dbcfg.host
         });
 
-        const [rows, fields] = await connection.query("SELECT * FROM tbl_chargingstations NATURAL JOIN tbl_chargingports NATURAL JOIN tbl_chargetypes WHERE chargetype_id=?;", [ctid]);
+        const [rows, fields] = await connection.query("SELECT * FROM tbl_chargingstations NATURAL JOIN tbl_chargingports NATURAL JOIN tbl_chargetypes WHERE chargetype_id=? OR chargetype_id=4;", [ctid]);
         resp.code = 0;
         resp.message = 'ok';
         resp.data = rows;

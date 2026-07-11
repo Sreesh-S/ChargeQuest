@@ -97,7 +97,7 @@ const checkDuplicate = async (uid, comp, model, ctid) => {
     }
 };
 
-const create = async (uid, comp, model, ctid) => {
+const create = async (uid, comp, model, ctid, colour = 'Blue', capacity = 40, range = 312) => {
     var resp = new ApiResponse();
     try {
         const dbcfg = new dbconfig();
@@ -108,7 +108,7 @@ const create = async (uid, comp, model, ctid) => {
             host: dbcfg.host
         });
 
-        await connection.execute("INSERT INTO `tbl_vehicles` (`company`,`model`,`chargetype_id`,`user_id`) VALUES (?,?,?,?);", [ comp, model, ctid, uid ]);
+        await connection.execute("INSERT INTO `tbl_vehicles` (`company`,`model`,`chargetype_id`,`user_id`,`vehicle_colour`,`battery_capacity`,`vehicle_range`) VALUES (?,?,?,?,?,?,?);", [ comp, model, ctid, uid, colour, capacity, range ]);
         const [rows, fields] = await connection.query("SELECT LAST_INSERT_ID() as lid;");
         
         resp.code = 0;

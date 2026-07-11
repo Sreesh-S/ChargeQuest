@@ -2,46 +2,79 @@ doctype html
 html(lang="en")
     head
         meta(charset="utf-8")
-        meta(content="width=device-width, initial-scale=1" 
-            name="viewport")
+        meta(content="width=device-width, initial-scale=1" name="viewport")
         title ChargeQuest - Admin Login
-        link(rel="stylesheet" 
-            href="/bootstrap/css/bootstrap.min.css")
-        link(rel="stylesheet" 
-            href="/fonts/fonts.css")
-        link(rel="stylesheet" 
-            href="/fonts/materialdesignicons.min.css")
-        link(rel="stylesheet" 
-            href="/custom/css/common.css")
-        link(rel="stylesheet" 
-            href="/custom/css/admin_login.css")
+        link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+        link(rel="stylesheet" href="/custom/css/common.css")
+        style.
+            .login-container {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+            .login-bg-glow {
+                position: absolute;
+                width: 300px;
+                height: 300px;
+                background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, rgba(0,0,0,0) 70%);
+                top: 20%;
+                left: 30%;
+                z-index: -1;
+                filter: blur(40px);
+            }
+            .login-bg-glow-2 {
+                position: absolute;
+                width: 350px;
+                height: 350px;
+                background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(0,0,0,0) 70%);
+                bottom: 20%;
+                right: 25%;
+                z-index: -1;
+                filter: blur(50px);
+            }
+
     body
         span#resp.hidden= resp
-        .container
-            .row 
-                .col-lg-4.col-md-4.col-sm-12.col-xs-12.offset-lg-4.offset-md-4
-                    form#frmLogin(method="post" action="/admin/login" onsubmit="return ValidateLogin();")
-                        h2.text-center 
-                            b ChargeQuest
-                            br 
-                            | Admin Login
-                        .card.mt-3 
-                            .card-body 
-                                h4 Enter Login Credentials 
-                                .form-group.mt-5.mb-3 
-                                    label.form-label(for="tbLogin") Login ID
-                                    input#tbLogin(type="text" name="login" class="form-control")
-                                    .invalid-feedback Login ID is required!
-                                .form-group.mb-3 
-                                    label.form-label(for="tbPasswd") Password
-                                    input#tbPasswd(type="password" name="passwd" class="form-control")
-                                    .invalid-feedback Password is required! 
-                                .form-group.mt-5 
-                                    button.btn.btn-primary.btn-lg.w-100(type="submit" name="submit_login") 
-                                        span.mdi.mdi-login 
-                                        | Login
+        
+        .login-bg-glow
+        .login-bg-glow-2
 
-                                
+        .container.login-container
+            .row.w-100.justify-content-center
+                .col-lg-5.col-md-7.col-12
+                    .text-center.mb-4
+                        img.mb-3(src="/media/applogo.svg" alt="logo" style="width: 80px; filter: drop-shadow(0 0 15px rgba(239,68,68,0.4));")
+                        h1.mb-1.fw-extrabold.text-white ChargeQuest
+                        p.text-muted Grid Operator Control Panel
+
+                    .glass-card.p-4
+                        h3.text-center.mb-4.text-white Admin Control Sign In
+                        
+                        form#frmLogin(method="post" action="/admin/login" onsubmit="return ValidateLogin();")
+                            .form-group.mb-3
+                                label.form-label.text-muted(for="tbLogin") Admin ID
+                                .input-group
+                                    span.input-group-text.bg-dark.border-secondary
+                                        i.fa-solid.fa-shield.text-muted
+                                    input#tbLogin.form-control(type="text" name="login" placeholder="e.g. siteadmin")
+                                    .invalid-feedback Login ID is required!
+                            
+                            .form-group.mb-4
+                                label.form-label.text-muted(for="tbPasswd") operator Password
+                                .input-group
+                                    span.input-group-text.bg-dark.border-secondary
+                                        i.fa-solid.fa-key.text-muted
+                                    input#tbPasswd.form-control(type="password" name="passwd" placeholder="••••••••")
+                                    .invalid-feedback Password is required!
+                            
+                            .mb-3
+                                button.btn.btn-primary.w-100(type="submit" name="submit_login" style="background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.35);")
+                                    i.fa-solid.fa-unlock-keyhole.me-2
+                                    | Authenticate Console
+
         script(src="/bootstrap/js/bootstrap.bundle.min.js")
         script(src="/jquery/jquery.min.js")
         script(src="/custom/js/admin_login.js")

@@ -3,19 +3,12 @@ html(lang="en")
     head
         meta(charset="utf-8")
         meta(content="width=device-width, initial-scale=1" name="viewport")
-        title ChargeQuest - Admin Dashboard
+        title ChargeQuest - Admin Users
         link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
-        link(rel="stylesheet" 
-            href="/fonts/fonts.css")
-        link(rel="stylesheet" 
-            href="/fonts/materialdesignicons.min.css")
-        link(rel="stylesheet" 
-            href="/FA4/css/font-awesome.min.css")
-        link(rel="stylesheet" 
-            href="/custom/css/common.css")
-        link(rel="stylesheet" 
-            href="/custom/css/admin_users.css")
-    body.position-relative
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+        link(rel="stylesheet" href="/custom/css/common.css")
+
+    body
         span#resp.hidden= resp
         span#users.hidden= userlist
 
@@ -28,23 +21,23 @@ html(lang="en")
                 .modal-dialog
                     .modal-content
                         .modal-header
-                            h5.modal-title Change Status
+                            h5.modal-title Adjust Driver Status
                             button.btn-close(aria-label="Close" data-bs-dismiss="modal" type="button")
                         .modal-body
-                            .form-group.mt-5.mb-3 
-                                label.form-label(for="tbFullName") Full name
+                            .mb-3 
+                                label.form-label.text-muted(for="tbFullName") Full Name
                                 input#tbCSFullName.form-control(type="text" name="fullname" readonly="")
-                            .form-group.mb-3 
-                                label.form-label(for="ddStatus") Status 
+                            .mb-3 
+                                label.form-label.text-muted(for="ddStatus") Status 
                                 select#ddCSStatus.form-select(name="status")
                                     option(value='-1') --Select Status--
                                     option(value='active') Active 
                                     option(value='inactive') Inactive 
                                     option(value='suspended') Suspended
-                                .invalid-feedback Select a status!
+                                .invalid-feedback Select status!
                         .modal-footer
                             button.btn.btn-secondary(data-bs-dismiss="modal" type="button") Close
-                            button.btn.btn-primary(type="submit" name="submit_chstatus") Save changes
+                            button.btn.btn-primary(type="submit" name="submit_chstatus") Save Changes
         
         form#frmDeleteUser(method="post" action="/admin/users" onsubmit="return ValidateDelete();")
             input#hdnDelUserID(type="hidden" name="userid")
@@ -52,28 +45,29 @@ html(lang="en")
                 .modal-dialog
                     .modal-content
                         .modal-header
-                            h5.modal-title Delete User
+                            h5.modal-title Terminate Account
                             button.btn-close(aria-label="Close" data-bs-dismiss="modal" type="button")
                         .modal-body
-                            p Are you sure ....
+                            p.text-danger.fw-bold WARNING: This action is permanent and will remove all driver telemetry and vehicles.
+                            p.text-muted.mb-0 Are you sure you want to delete this user?
                         .modal-footer
                             button.btn.btn-secondary(data-bs-dismiss="modal" type="button") Close
-                            button.btn.btn-danger(type="submit" name="submit_del") Delete
+                            button.btn.btn-danger(type="submit" name="submit_del") Terminate Account
 
-        .container 
+        .container.mb-5 
             .row 
                 .col-12 
-                    #userListCard.card.mt-5 
-                        .card-body 
-                            h3 User List
-                            table#tblUserList.table.table-striped.table-hover.mt-4
+                    .glass-card
+                        h3.mb-4 Registered EV Drivers
+                        .table-responsive
+                            table#tblUserList.table.table-glass
                                 thead 
                                     tr 
                                         th #
-                                        th Fullname 
-                                        th E-mail
+                                        th Full Name 
+                                        th Email Address
                                         th Mobile 
-                                        th Address 
+                                        th Home Address 
                                         th City 
                                         th Status 
                                         th Actions 

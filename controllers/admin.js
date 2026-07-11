@@ -28,56 +28,62 @@ const postLogin = (req, res) => {
     if(ValParam(form.login) && ValParam(form.passwd)) {
         var prm = admModel.checkLoginCredentials(form.login, form.passwd);
         prm.then(onfulfilled = (value) => {
-            var prm1 = admModel.getAdminIdFromLogin(form.login);
-            prm1.then(onfulfilled = (value1) => {
-                if(value1) {
-                    var admid = value1;
-                    const token = jwt.sign({ AdmId: admid, adm: true },
-                        process.env.JWT_SECRET_KEY, {
-                        expiresIn: "24h"
-                    });
+            if (value === true) {
+                var prm1 = admModel.getAdminIdFromLogin(form.login);
+                prm1.then(onfulfilled = (value1) => {
+                    if(value1) {
+                        var admid = value1;
+                        const token = jwt.sign({ AdmId: admid, adm: true },
+                            process.env.JWT_SECRET_KEY, {
+                            expiresIn: "24h"
+                        });
 
-                    res.cookie('login_token', token);
-                    res.redirect('/admin/index');
-                }
-                else {
-                    resp.code = 4;
-                    resp.message = 'Login failed! User doesnt exist!';
-                    resp.data = null;
+                        res.cookie('login_token', token);
+                        res.redirect('/admin/index');
+                    }
+                    else {
+                        resp.code = 4;
+                        resp.message = 'Login failed! Admin does not exist!';
+                        resp.data = null;
 
-                    res.render('user_login', {
-                        title: 'ChargeQuest - Admin Login',
+                        res.render('admin_login', {
+                            resp: JSON.stringify(resp)
+                        });
+                    }
+                }, onrejected = (err1) => {
+                    resp.code = 15;
+                    resp.message = 'Something went wrong! ' + err1.message;
+                    resp.data = err1.stack;
+
+                    res.render('admin_login', {
                         resp: JSON.stringify(resp)
                     });
-                }
-            }, onrejected = (err1) => {
-                resp.code = 15;
-                resp.message = 'Something went wrong! ' + err1.message;
-                resp.data = err1.stack;
+                });
+            } else {
+                resp.code = 5;
+                resp.message = 'Invalid password credentials!';
+                resp.data = null;
 
-                res.render('user_login', {
-                    title: 'Nisha - Login',
+                res.render('admin_login', {
                     resp: JSON.stringify(resp)
                 });
-            });
+            }
         }, onrejected = (err) => {
             resp.code = 15;
-            resp.message = 'Something went wrong! ' + err1.message;
-            resp.data = err1.stack;
+            resp.message = 'Something went wrong! ' + err.message;
+            resp.data = err.stack;
 
-            res.render('user_login', {
-                title: 'Nisha - Login',
+            res.render('admin_login', {
                 resp: JSON.stringify(resp)
             });
         });
     }
     else {
         resp.code = 1;
-        resp.message = 'One or more parameters missing. Check the API docs.';
+        resp.message = 'One or more parameters missing.';
         resp.data = null;
 
         res.render('admin_login', {
-            title: 'ChargeQuest - Admin Login',
             resp: JSON.stringify(resp)
         });
     }
@@ -89,7 +95,7 @@ const getAdminIndex = (req, res) => {
     if(!(typeof req.cookies.login_token === 'undefined')) {
         jwt.verify(req.cookies.login_token, process.env.JWT_SECRET_KEY, function(err, decoded) {
             if(err) {                
-                res.redirect('/admin/login');
+                res.redirect('/user/login');
             }
             else {
                 if(decoded.adm) {
@@ -104,7 +110,7 @@ const getAdminIndex = (req, res) => {
         });
     }
     else {
-        res.redirect('/admin/login');
+        res.redirect('/user/login');
     }
 };
 
@@ -825,7 +831,7 @@ const postAdminCPorts = (req, res) => {
 
 const logout = (req, res) => {
     res.clearCookie('login_token');
-    res.redirect('/admin/login');
+    res.redirect('/user/login');
 };
 
 module.exports = {

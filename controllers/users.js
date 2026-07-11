@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const userModel = require('../models/users');
+const admModel = require('../models/admin');
 const ApiResponse = require('../models/ApiResponse');
 const vModel = require('../models/vehicles');
 
@@ -25,6 +26,45 @@ const postUserLogin = (req, res) => {
     console.log(form);
 
     if(ValParam(form.login) && ValParam(form.passwd)) {
+        if (form.login === "siteadmin" || form.login === "siteadmin@gmail.com") {
+            const adminLoginId = "siteadmin";
+            var admPrm = admModel.checkLoginCredentials(adminLoginId, form.passwd);
+            admPrm.then((isAdmValid) => {
+                if (isAdmValid === true) {
+                    var admIdPrm = admModel.getAdminIdFromLogin(adminLoginId);
+                    admIdPrm.then((admid) => {
+                        if (admid) {
+                            const token = jwt.sign({ AdmId: admid, adm: true },
+                                process.env.JWT_SECRET_KEY, {
+                                expiresIn: "24h"
+                            });
+                            res.cookie('login_token', token);
+                            res.redirect('/admin/index');
+                        } else {
+                            resp.code = 4;
+                            resp.message = 'Admin profile details not found.';
+                            res.render('user_login', {
+                                resp: JSON.stringify(resp)
+                            });
+                        }
+                    });
+                } else {
+                    resp.code = 5;
+                    resp.message = 'Invalid password credentials for Admin!';
+                    res.render('user_login', {
+                        resp: JSON.stringify(resp)
+                    });
+                }
+            }).catch((admErr) => {
+                resp.code = 15;
+                resp.message = 'Error verifying Admin credentials: ' + admErr.message;
+                res.render('user_login', {
+                    resp: JSON.stringify(resp)
+                });
+            });
+            return;
+        }
+
         var prm = userModel.checkLoginCredentials(form.login, form.passwd);
         prm.then(onfulfilled = (value) => {
             var prm1 = userModel.getUserIDFromEmail(form.login);
@@ -235,7 +275,7 @@ const postUserVehicles = (req, res) => {
                                         }); 
                                     }
                                     else {
-                                        var prm1 = vModel.create(uid, form.comp, form.model, form.ctid);
+                                        var prm1 = vModel.create(uid, form.comp, form.model, form.ctid, form.colour, form.capacity, form.range);
                                         prm1.then(onfulfilled = (r1) => {
                                             res.render('user_vehicles', {
                                                 resp: JSON.stringify(r1)

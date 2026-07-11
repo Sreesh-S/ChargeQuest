@@ -3,74 +3,233 @@ html(lang="en")
     head
         meta(charset="utf-8")
         meta(content="width=device-width, initial-scale=1" name="viewport")
-        title ChargeQuest - Home
+        title ChargeQuest - Smart EV Charging Platform
         link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
-        link(rel="stylesheet" 
-            href="/fonts/fonts.css")
-        link(rel="stylesheet" 
-            href="/fonts/materialdesignicons.min.css")
-        link(rel="stylesheet" 
-            href="/FA4/css/font-awesome.min.css")
-        link(rel="stylesheet" 
-            href="/custom/css/common.css")
-        script(async="" defer="" src="https://apis.mappls.com/advancedmaps/api/41f389716b70ccd9d515800dc7e9e69b/map_sdk?layer=vector&v=3.0&callback=initMap1")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+        link(rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css")
+        link(rel="stylesheet" href="/custom/css/common.css")
+        script(src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js")
+        style.
+            .map-container {
+                height: calc(100vh - 130px);
+                position: relative;
+            }
+            .sidebar-overlay {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                width: 380px;
+                max-height: calc(100% - 40px);
+                z-index: 1000;
+                overflow-y: auto;
+                pointer-events: auto;
+            }
+            .right-sidebar-overlay {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 360px;
+                max-height: calc(100% - 40px);
+                z-index: 1000;
+                overflow-y: auto;
+            }
+            @media (max-width: 991px) {
+                .map-container {
+                    height: 500px;
+                }
+                .sidebar-overlay, .right-sidebar-overlay {
+                    position: static;
+                    width: 100%;
+                    max-height: none;
+                    margin-bottom: 20px;
+                }
+            }
+            .recommendation-item {
+                border-left: 4px solid transparent;
+                transition: all 0.2s ease;
+            }
+            .recommendation-item.top-match {
+                border-left-color: var(--accent-glow);
+                background: rgba(16, 185, 129, 0.05);
+            }
+            .score-badge {
+                font-family: var(--font-heading);
+                font-weight: 700;
+                border-radius: 8px;
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
 
-    body.position-relative
+    body
         span#resp.hidden= resp
-        span#cslist.hidden= cslist
 
         include include/bs5_modals.pug
         include include/user_navbar.pug
 
-        #LocPickerModal.modal(tabindex="-1")
-            input#hdnLocInfo(type="hidden" name="locinfo")
-            .modal-dialog
-                .modal-content
-                    .modal-header
-                        h5.modal-title Location Picker
-                        button.btn-close(aria-label="Close" data-bs-dismiss="modal" type="button")
-                    .modal-body
+        .container-fluid.px-4
+            .row
+                // Left Panel: Search, Recommended Stations & Controls
+                .col-lg-4.col-md-5.col-12
+                    .glass-card.mb-4
+                        h3.mb-1 ⚡ ChargeQuest Hub
+                        p.text-muted.small AI-Powered Recommendation Engine
+                        
+                        .d-flex.align-items-center.gap-2.p-3.mb-3(style="background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--glass-border);")
+                            i.fa-solid.fa-user-circle.fs-3.text-success
+                            div
+                                div.small.text-muted Driver
+                                div.fw-bold#lblUserName Guest User
+                        
+                        .mb-3
+                            label.form-label.small.text-muted Select active EV from Garage
+                            select#ddVehicles.form-select
+                                option(value="-1") Loading garage...
+
+                        .mb-3
+                            label.form-label.small.text-muted Search location
+                            .input-group
+                                span.input-group-text.bg-dark.border-secondary
+                                    i.fa-solid.fa-magnifying-glass.text-muted
+                                input#tbLoc.form-control(type="text" placeholder="Click map to pick location...")
+                                button#btnLocate.btn.btn-secondary(type="button" title="Get Current Location")
+                                    i.fa-solid.fa-location-crosshairs
+
+                        .d-grid
+                            button#btnSearch.btn.btn-primary.btn-lg(type="button")
+                                i.fa-solid.fa-wand-magic-sparkles.me-2
+                                | Match Optimal Stations
+
+                    // AI Smart Recommendations list
+                    .glass-card.mb-4(style="max-height: 400px; overflow-y: auto;")
+                        h5.mb-3.d-flex.justify-content-between.align-items-center
+                            span Optimal Matches
+                            span.badge.bg-success.badge-live#lblCount 0 found
+                        
+                        #recommendationsList.d-flex.flex-column.gap-3
+                            .text-center.py-4.text-muted
+                                i.fa-solid.fa-sliders.fs-2.mb-2
+                                p Enter location and match to find compatible charging stations.
+
+                // Center & Right: Map View & Sidebars
+                .col-lg-8.col-md-7.col-12
+                    .map-container.mb-4
                         #map
-                    .modal-footer
-                        button.btn.btn-primary(data-bs-dismiss="modal" type="button") Select
-
-        .container 
-            .row 
-                .col-lg-4.col-md-4.col-sm-12.col-xs-12 
-                    form#frmAdd(method="post" action="/admin/cstations" onsubmit="return ValidateAdd();")
-                        input#hdnLoc(type="hidden" name="loc")
-                        .card.mt-5 
-                            .card-body 
-                                h4 Welcome
-                                    span#lblUserName &nbsp;
-                                .input-group.mt-5
-                                    label.form-label(for="tbLoc")
-                                    input#tbLoc.form-control(type="text" name="loc")
-                                    button#btnTriggerLocationSelect.btn.btn-outline-secondary(type="button") Location
-
-                                .form-group.mb-3 
-                                    label.form-label(for="ddVehicle") Select vehicle
-                                    select#ddVehicles.form-select(name="vid")
-                                        option Tata Tiago EV                                     
-                                    .invalid-feedback Car is required! 
+                        
+                        // Floating Left overlay inside Map: Route Planner
+                        .sidebar-overlay.d-none#routePlannerCard
+                            .glass-card
+                                div.d-flex.justify-content-between.align-items-center.mb-3
+                                    h5.mb-0 🧭 EV Trip Route Planner
+                                    button.btn-close#btnCloseRoutePlanner(type="button" style="font-size:0.8rem;")
+                                .mb-2
+                                    label.small.text-muted Start Point
+                                    input#routeStart.form-control.form-control-sm(type="text" value="Current Location" readonly)
+                                .mb-3
+                                    label.small.text-muted Waypoint / Destination
+                                    input#routeEnd.form-control.form-control-sm(type="text" placeholder="Select destination..." readonly)
                                 
-                                .form-group.mt-5 
-                                    button#btnSearch.btn.btn-primary.btn-lg.float-end(type="button") Search
+                                .p-3.mb-3(style="background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid var(--glass-border);")
+                                    div.d-flex.justify-content-between.small.mb-1
+                                        span Trip Distance:
+                                        span.fw-bold#routeDist -- km
+                                    div.d-flex.justify-content-between.small.mb-1
+                                        span Est. Travel Time:
+                                        span.fw-bold#routeTime -- mins
+                                    div.d-flex.justify-content-between.small.mb-1
+                                        span Estimated Battery Consumption:
+                                        span.fw-bold.text-warning#routeConsumption -- %
+                                    div.d-flex.justify-content-between.small
+                                        span Weather Impact:
+                                        span.fw-bold.text-success#routeWeather Normal Range
+                                
+                                button#btnSimulateRoute.btn.btn-primary.btn-sm.w-100 Start Simulated Navigation
 
-                .col-lg-8.col-md-8.col-sm-12.col-xs-12 
-                    .card.mt-5 
-                        .card-body 
-                            h4 Search result(s)
-                            table#tblSearchRes.table.table-striped.table-hover
-                                thead   
-                                    tr 
-                                        th #
-                                        th Name 
-                                        th Location 
-                                        th Distance
-                                        th Status 
-                                tbody
-                                    
+                        // Floating Right overlay inside Map: Booking & Payments Wallet
+                        .right-sidebar-overlay
+                            // Booking Panel
+                            .glass-card.mb-3.d-none#bookingCard
+                                div.d-flex.justify-content-between.align-items-center.mb-2
+                                    h5.mb-0 📅 Book Charging Slot
+                                    button.btn-close#btnCloseBooking(type="button" style="font-size:0.8rem;")
+                                p.text-muted.small#bookingStationInfo Station Name
+                                .mb-2
+                                    label.small.text-muted Select Connector Port
+                                    select#ddBookingPorts.form-select.form-select-sm
+                                .mb-3
+                                    label.small.text-muted Select Date & Time
+                                    input#tbBookingTime.form-control.form-control-sm(type="datetime-local")
+                                button#btnConfirmBooking.btn.btn-primary.btn-sm.w-100 Confirm Reservation
+
+                            // Active Charging Live Telemetry Session Panel
+                            .glass-card.mb-3.d-none#chargingTelemetryCard
+                                h5.text-success.d-flex.align-items-center.gap-2.mb-3
+                                    i.fa-solid.fa-circle-bolt.pulseGlow
+                                    | Live Charging Session
+                                
+                                .battery-container
+                                    .battery-level.charging#sessionBatteryFill(style="width: 10%;")
+                                
+                                .text-center.mb-3
+                                    span.fs-2.fw-bold#sessionBatteryPercent 10%
+                                    span.text-muted / 100%
+                                
+                                .row.g-2.mb-3.text-center.small
+                                    .col-6
+                                        .p-2.bg-dark.border.border-secondary.rounded
+                                            div.text-muted Voltage
+                                            div.fw-bold#sessionVoltage 398.2 V
+                                    .col-6
+                                        .p-2.bg-dark.border.border-secondary.rounded
+                                            div.text-muted Current
+                                            div.fw-bold#sessionCurrent 128.4 A
+                                    .col-6
+                                        .p-2.bg-dark.border.border-secondary.rounded
+                                            div.text-muted Power Speed
+                                            div.fw-bold#sessionPower 50 kW
+                                    .col-6
+                                        .p-2.bg-dark.border.border-secondary.rounded
+                                            div.text-muted Energy Delivered
+                                            div.fw-bold#sessionEnergy 0.0 kWh
+                                
+                                .d-flex.justify-content-between.small.mb-3.p-2.bg-dark.rounded
+                                    span Accumulated Bill:
+                                    span.fw-bold.text-success#sessionCost ₹0.00
+                                
+                                button#btnEmergencyStop.btn.btn-danger.btn-sm.w-100 Emergency Stop
+
+                            // Virtual Wallet Panel
+                            .glass-card.mb-3
+                                h5 💳 Digital Wallet
+                                .d-flex.justify-content-between.align-items-center.p-3.mb-3.bg-dark.rounded
+                                    span Balance
+                                    span.fs-4.fw-bold.text-success#lblWalletBalance ₹0.00
+                                .input-group.input-group-sm.mb-2
+                                    input#tbRechargeAmount.form-control(type="number" placeholder="Enter amount..." value="500")
+                                    button#btnRechargeWallet.btn.btn-success(type="button") Recharge
+                                
+                                div.small.text-muted.mb-1 Recent Transactions
+                                #walletTransactionsList(style="max-height: 100px; overflow-y: auto; font-size: 0.8rem;")
+                                    div.text-muted.text-center.py-2 No transactions
+
+                            // User Bookings Panel
+                            .glass-card
+                                h5 📌 Saved Reservations
+                                #userBookingsList.d-flex.flex-column.gap-2(style="max-height: 120px; overflow-y: auto;")
+                                    div.text-muted.small.text-center.py-2 No reservations
+
+        // Floating AI Assistant Chatbot
+        .chat-toggle-btn#btnToggleChat
+            i.fa-solid.fa-robot
+        
+        .chat-widget.glass-card#chatWidget
+            .d-flex.justify-content-between.align-items-center.pb-2.border-bottom.border-secondary
+                h6.mb-0 🤖 AI Charging Assistant
+                button.btn-close#btnCloseChat(type="button" style="font-size:0.8rem;")
+            .chat-messages#chatMessages
+                .chat-msg.bot Hello! I'm your AI EV assistant. Ask me anything about compatible stations, battery optimization, or route planning!
+            .input-group.input-group-sm.p-2
+                input#chatInput.form-control(type="text" placeholder="Type a message...")
+                button#btnSendChat.btn.btn-primary(type="button") Send
 
         include include/footer.pug
 

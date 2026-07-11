@@ -1,5 +1,6 @@
 var addModal = new bootstrap.Modal('#AddModal', { backdrop : 'static' });
 var editModal = new bootstrap.Modal('#EditModal', { backdrop : 'static' });
+var delModal = new bootstrap.Modal('#DeleteModal', { backdrop : 'static' });
 
 $("#ddSelectCS").change(function () {
     var csid = $("#ddSelectCS").val();
@@ -17,7 +18,7 @@ $("#ddSelectCS").change(function () {
                         var row = rows[i];
                         html += "<tr>";
                         html += ("<td>" + (i+1) + "</td><td>" + row.chargingport_name + "</td><td>" + row.chargetype_name + "</td><td>" + row.chargingport_status + "</td>");
-                        html += ("<td style='width: 200px;'><button onclick='onEdit(" + row.vehicle_id + ");' class='btn btn-warning btn-sm w-100 p-0'>Edit</button><br/><button onclick='onDelete(" + row.vehicle_id + ");' class='btn btn-danger btn-sm w-100 p-0'>Delete</button><br/></td>");
+                        html += ("<td><button onclick='onEdit(" + row.chargingport_id + ");' class='btn btn-warning btn-sm me-2 px-3 py-1'>Edit</button><button onclick='onDelete(" + row.chargingport_id + ");' class='btn btn-danger btn-sm px-3 py-1'>Delete</button></td>");
                         html += "</tr>";
                     }
     
@@ -76,6 +77,7 @@ function FillCTypes() {
                 }
 
                 $("#ddAPChargeType").html(html);
+                $("#ddEditChargeType").html(html);
             }
         }
         else {

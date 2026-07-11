@@ -2,87 +2,100 @@ doctype html
 html(lang="en")
     head
         meta(charset="utf-8")
-        meta(content="width=device-width, initial-scale=1" 
-            name="viewport")
-        title ChargeQuest - Signup
-        link(rel="stylesheet" 
-            href="/bootstrap/css/bootstrap.min.css")
-        link(rel="stylesheet" 
-            href="/fonts/fonts.css")
-        link(rel="stylesheet" 
-            href="/fonts/materialdesignicons.min.css")
-        link(rel="stylesheet" 
-            href="/custom/css/common.css")
-        link(rel="stylesheet" 
-            href="/custom/css/user_signup.css")
+        meta(content="width=device-width, initial-scale=1" name="viewport")
+        title ChargeQuest - User Sign Up
+        link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+        link(rel="stylesheet" href="/custom/css/common.css")
+        style.
+            .signup-container {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 40px 0;
+            }
+
     body
         include include/bs5_modals.pug 
         span#resp.hidden= resp
+
         #LoginModal.modal(tabindex="-1")
             .modal-dialog
                 .modal-content
                     .modal-header
-                        h5.modal-title Modal title
+                        h5.modal-title Registration Successful!
                         button.btn-close(aria-label="Close" data-bs-dismiss="modal" type="button")
                     .modal-body
-                        p Your account has been created and ready! Login to the account to start your ChargeQuest journey.
+                        p.text-muted.mb-0 Your account has been created. Sign in to register your vehicle and find optimal charging terminals.
                     .modal-footer
-                        a.btn.btn-primary(href="/user/login") Go to Login...
+                        a.btn.btn-primary(href="/user/login") Proceed to Sign In
 
-        .container
-            .row 
-                .col-lg-8.offset-lg-2.col-md-8.offset-md-2.col-sm-12
-                    form#frmLogin(method="post" action="/user/signup" onsubmit="return ValidateSignup();")
-                        h2.text-center 
-                            b ChargeQuest
-                            br 
-                            | User Sign-Up
-                        .card.mt-3.shadow
-                            .card-body 
-                                .row 
-                                    .col-lg-6.col-md-6.col-sm-12
-                                        .form-group.mt-5.mb-3 
-                                            label.form-label(for="tbFullName") Full name
-                                            input#tbFullName.form-control(type="text" name="fullname")
-                                            .invalid-feedback Fullname is required! 
-                                        .form-group.mb-3 
-                                            label.form-label(for="tbEmail") E-mail
-                                            input#tbEmail.form-control(type="email" name="email")
-                                            .invalid-feedback E-mail is required! 
-                                        .form-group.mb-3 
-                                            label.form-label(for="tbPasswd") Password
-                                            input#tbPasswd.form-control(type="password" name="passwd")
-                                            .invalid-feedback The password should be 6 characters or more, atleast 1 capital letter, 1 small letter, 1 digit, 1 special symbol.
-                                        .form-group.mb-3 
-                                            label.form-label(for="tbPasswd1") Confirm password
-                                            input#tbPasswd1.form-control(type="password" name="passwd1")
-                                            .invalid-feedback The passwords should match
+        .container.signup-container
+            .row.w-100.justify-content-center
+                .col-lg-8.col-md-10.col-12
+                    .text-center.mb-4
+                        img.mb-2(src="/media/applogo.svg" alt="logo" style="width: 60px; filter: drop-shadow(0 0 10px rgba(16,185,129,0.5));")
+                        h2.text-white.fw-bold Register Driver Account
+                        p.text-muted Join ChargeQuest EV Grid
 
-                                    .col-lg-6.col-md-6.col-sm-12
-                                        .form-group.mt-5.mb-3 
-                                            label.form-label(for="tbMobile") Mobile
-                                            input#tbMobile.form-control(type="tel" name="mobile")
-                                            .invalid-feedback Mobile is required!
-                                        .form-group.mb-3 
-                                            label.form-label(for="tbAddress") Address
-                                            textarea#tbAddress.form-control(name="addr" rows="2")
-                                            .invalid-feedback Address is required! 
-                                        .form-group.mb-3 
-                                            label.form-label(for="tbCity") City
-                                            input#tbCity.form-control(type="text" name="city")
-                                            .invalid-feedback City is required!
-                                        .form-group.mb-3 
-                                            label.form-label(for="tbDob") Date of birth
-                                            input#tbDob.form-control(type="date" name="dob")
-                                            .invalid-feedback Date of birth is required! 
-                                
-                                .row 
-                                    .form-group
-                                        button#btnSubmit.btn.btn-primary.btn-lg.w-100.mt-5(type="submit" name="submit_signup") 
-                                            span.mdi.mdi-account-plus
-                                            | &nbsp;Sign Up!
+                    .glass-card.p-4
+                        form#frmLogin(method="post" action="/user/signup" onsubmit="return ValidateSignup();")
+                            .row 
+                                // Left Side Form
+                                .col-md-6.col-12.mb-3
+                                    .mb-3
+                                        label.form-label.text-muted(for="tbFullName") Full Name
+                                        input#tbFullName.form-control(type="text" name="fullname" placeholder="John Doe")
+                                        .invalid-feedback Fullname is required! 
+                                    
+                                    .mb-3
+                                        label.form-label.text-muted(for="tbEmail") E-mail Address
+                                        input#tbEmail.form-control(type="email" name="email" placeholder="john@example.com")
+                                        .invalid-feedback E-mail is required! 
+                                    
+                                    .mb-3
+                                        label.form-label.text-muted(for="tbPasswd") Password
+                                        input#tbPasswd.form-control(type="password" name="passwd" placeholder="••••••••")
+                                        .invalid-feedback Length >= 6, 1 uppercase, 1 lowercase, 1 number, 1 special char required.
+                                    
+                                    .mb-3
+                                        label.form-label.text-muted(for="tbPasswd1") Confirm Password
+                                        input#tbPasswd1.form-control(type="password" name="passwd1" placeholder="••••••••")
+                                        .invalid-feedback The passwords must match.
 
-                                
+                                // Right Side Form
+                                .col-md-6.col-12.mb-3
+                                    .mb-3
+                                        label.form-label.text-muted(for="tbMobile") Mobile Number
+                                        input#tbMobile.form-control(type="tel" name="mobile" placeholder="9876543210")
+                                        .invalid-feedback Mobile number is required!
+                                    
+                                    .mb-3
+                                        label.form-label.text-muted(for="tbAddress") Home Address
+                                        textarea#tbAddress.form-control(name="addr" rows="2" placeholder="Street, City, ZIP")
+                                        .invalid-feedback Address is required! 
+                                    
+                                    .mb-3
+                                        label.form-label.text-muted(for="tbCity") City
+                                        input#tbCity.form-control(type="text" name="city" placeholder="Kottayam")
+                                        .invalid-feedback City is required!
+                                    
+                                    .mb-3
+                                        label.form-label.text-muted(for="tbDob") Date of Birth
+                                        input#tbDob.form-control(type="date" name="dob")
+                                        .invalid-feedback Date of birth is required! 
+
+                            .row.mt-3
+                                .col-12
+                                    button#btnSubmit.btn.btn-primary.w-100(type="submit" name="submit_signup") 
+                                        i.fa-solid.fa-user-plus.me-2
+                                        | Create Account
+                            
+                            .text-center.mt-3
+                                span.text-muted.small Already registered? 
+                                a.small.text-success.fw-bold.text-decoration-none(href="/user/login") Sign In
+
         script(src="/bootstrap/js/bootstrap.bundle.min.js")
         script(src="/jquery/jquery.min.js")
         script(src="/custom/js/bs5_modals.js")

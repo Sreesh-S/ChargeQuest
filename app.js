@@ -25,6 +25,11 @@ app.use('/admin', admRoute);
 app.use('/user', userRoute);
 app.use('/api', apiRouter);
 
+// Start the real-time background charging simulator
+const simulator = require('./controllers/simulator');
+simulator.startSimulatorLoop();
+
 app.listen(PORT, () => {
     console.log(`ChargeQuest webapp running at http://localhost:${PORT}/`);
 });
+

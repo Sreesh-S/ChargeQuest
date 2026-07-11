@@ -466,43 +466,106 @@ const search = (req, res) => {
     
     if(ValParam(form.vid) && ValParam(form.loc)) {
         var vehicle = form.vid;
-        var latlong = JSON.parse(form.loc);
+        var latlong;
+        try {
+            latlong = JSON.parse(form.loc);
+        } catch(e) {
+            latlong = { lat: 9.5805097, lng: 76.537262 };
+        }
 
         var prm = vModel.get(vehicle);
         prm.then(onfulfilled = (r) => {
-            if(r.code === 0) {
+            if(r.code === 0 && r.data) {
                 var ctid = r.data.chargetype_id;
                 var prm1 = csModel.search(ctid);
                 prm1.then(onfulfilled = (r1) => {
                     if(r1.code === 0) {
-                        var stations = r1.data;
-                        if(Array.isArray(stations) && stations.length > 0) {
-                            var results = [];
-                            for(var i = 0; i < stations.length; i++) {
-                                var row = stations[i];
-                                var dist = calcCrow(latlong.lat, latlong.lng, row.chargingstation_lat, row.chargingstation_lng);
-                                row.distance = dist;
-                                console.log(row);
-                                if(dist <= 10.0) {
-                                    results.push(row)
+                        var rawRows = r1.data;
+                        
+                        // Group by chargingstation_id
+                        const stationsMap = new Map();
+                        for (let row of rawRows) {
+                            if (!stationsMap.has(row.chargingstation_id)) {
+                                stationsMap.set(row.chargingstation_id, {
+                                    chargingstation_id: row.chargingstation_id,
+                                    chargingstation_name: row.chargingstation_name,
+                                    chargingstation_lat: parseFloat(row.chargingstation_lat),
+                                    chargingstation_lng: parseFloat(row.chargingstation_lng),
+                                    chargingstation_status: row.chargingstation_status,
+                                    ports: []
+                                });
+                            }
+                            stationsMap.get(row.chargingstation_id).ports.push({
+                                chargingport_id: row.chargingport_id,
+                                chargingport_name: row.chargingport_name,
+                                chargetype_id: row.chargetype_id,
+                                chargetype_name: row.chargetype_name,
+                                chargingport_status: row.chargingport_status
+                            });
+                        }
+
+                        var results = [];
+                        for (let station of stationsMap.values()) {
+                            var dist = calcCrow(latlong.lat, latlong.lng, station.chargingstation_lat, station.chargingstation_lng);
+                            station.distance = dist;
+
+                            // Calculate ports breakdown
+                            let totalPorts = station.ports.length;
+                            let available = 0, occupied = 0, reserved = 0, offline = 0;
+                            let maxPowerKw = 22; // default
+
+                            for (let port of station.ports) {
+                                if (port.chargingport_status === 'Active') available++;
+                                else if (port.chargingport_status === 'Occupied') occupied++;
+                                else if (port.chargingport_status === 'Reserved') reserved++;
+                                else if (port.chargingport_status === 'Inactive') offline++;
+
+                                // Extrapolate power from name (e.g. 50kW) or default
+                                const kwMatch = port.chargingport_name.match(/(\d+)kW/i);
+                                if (kwMatch) {
+                                    maxPowerKw = Math.max(maxPowerKw, parseInt(kwMatch[1]));
                                 }
                             }
 
-                            resp.code = 0;
-                            resp.message = 'ok';
-                            resp.data = results;
+                            station.portsSummary = { totalPorts, available, occupied, reserved, offline, maxPowerKw };
 
-                            res.setHeader('Content-Type', 'application/json');
-                            res.send(resp);     
-                        }
-                        else {
-                            resp.code = 51;
-                            resp.message = "Empty result.";
-                            resp,data = null;
+                            // Dynamic variables for scoring (deterministic based on station ID)
+                            const rating = Math.round((4.0 + ((station.chargingstation_id * 3) % 10) / 10) * 10) / 10;
+                            const priceKwh = Math.round((10 + ((station.chargingstation_id * 7) % 9)) * 10) / 10;
+                            const queueLength = occupied + (reserved * 0.5);
 
-                            res.setHeader('Content-Type', 'application/json');
-                            res.send(resp);
+                            station.rating = rating;
+                            station.priceKwh = priceKwh;
+                            station.queueLength = queueLength;
+
+                            // Calculate Recommendation Score
+                            // 1. Distance Score: max 35 points (0km = 35 pts, 10km = 0 pts)
+                            const distanceScore = Math.max(0, 35 - (dist * 3.5));
+                            // 2. Availability Score: max 25 points (all free = 25 pts, none free = 0 pts)
+                            const availabilityScore = totalPorts > 0 ? (available / totalPorts) * 25 : 0;
+                            // 3. Price Score: max 20 points (₹10 = 20 pts, ₹18 = 0 pts)
+                            const priceScore = Math.max(0, 20 - (priceKwh - 10) * 2.5);
+                            // 4. Rating Score: max 20 points (5.0 = 20 pts, 4.0 = 10 pts)
+                            const ratingScore = Math.max(0, (rating - 3.0) * 10);
+
+                            const score = Math.round(distanceScore + availabilityScore + priceScore + ratingScore);
+                            station.recommendationScore = Math.min(100, Math.max(0, score));
+
+                            // Limit to 15km for recommendations
+                            if (dist <= 15.0) {
+                                results.push(station);
+                            }
                         }
+
+                        // Sort by recommendation score descending
+                        results.sort((a, b) => b.recommendationScore - a.recommendationScore);
+
+                        resp.code = 0;
+                        resp.message = 'ok';
+                        resp.data = results;
+
+                        res.setHeader('Content-Type', 'application/json');
+                        res.send(resp);
                     }
                     else {
                         res.setHeader('Content-Type', 'application/json');
@@ -526,6 +589,231 @@ const search = (req, res) => {
     }
 };
 
+// Simulator connection
+const simulator = require('./simulator');
+
+// Mock storage
+const walletBalances = new Map(); // userId -> number
+const walletTransactions = new Map(); // userId -> array of { date, type, amount, desc }
+const slotBookings = new Map(); // userId -> array of { bookingId, stationName, portName, dateTime, status }
+
+// Helper to get user ID from JWT token cookie
+function getUserIdFromToken(req) {
+    if (!req.cookies.login_token) return null;
+    try {
+        const decoded = jwt.verify(req.cookies.login_token, process.env.JWT_SECRET_KEY);
+        return decoded.userId || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+const getWallet = (req, res) => {
+    const userId = getUserIdFromToken(req);
+    const resp = new ApiResponse();
+    if (!userId) {
+        resp.code = 14; resp.message = "Login required.";
+        return res.json(resp);
+    }
+    if (!walletBalances.has(userId)) {
+        walletBalances.set(userId, 500.0); // Default balance
+        walletTransactions.set(userId, [
+            { date: new Date().toLocaleString(), type: 'Deposit', amount: 500.0, desc: 'Welcome Bonus Credited' }
+        ]);
+    }
+    resp.code = 0;
+    resp.message = "ok";
+    resp.data = {
+        balance: walletBalances.get(userId),
+        transactions: walletTransactions.get(userId)
+    };
+    res.json(resp);
+};
+
+const rechargeWallet = (req, res) => {
+    const userId = getUserIdFromToken(req);
+    const resp = new ApiResponse();
+    if (!userId) {
+        resp.code = 14; resp.message = "Login required.";
+        return res.json(resp);
+    }
+    const amount = parseFloat(req.body.amount);
+    if (!amount || amount <= 0) {
+        resp.code = 1; resp.message = "Invalid amount.";
+        return res.json(resp);
+    }
+    const currentBal = walletBalances.get(userId) || 0;
+    const newBal = currentBal + amount;
+    walletBalances.set(userId, newBal);
+    
+    if (!walletTransactions.has(userId)) walletTransactions.set(userId, []);
+    walletTransactions.get(userId).push({
+        date: new Date().toLocaleString(),
+        type: 'Deposit',
+        amount,
+        desc: 'Wallet Recharged'
+    });
+
+    resp.code = 0;
+    resp.message = "Recharge successful!";
+    resp.data = { balance: newBal };
+    res.json(resp);
+};
+
+const getBookings = (req, res) => {
+    const userId = getUserIdFromToken(req);
+    const resp = new ApiResponse();
+    if (!userId) {
+        resp.code = 14; resp.message = "Login required.";
+        return res.json(resp);
+    }
+    if (!slotBookings.has(userId)) {
+        slotBookings.set(userId, []);
+    }
+    resp.code = 0;
+    resp.message = "ok";
+    resp.data = slotBookings.get(userId);
+    res.json(resp);
+};
+
+const addBooking = async (req, res) => {
+    const userId = getUserIdFromToken(req);
+    const resp = new ApiResponse();
+    if (!userId) {
+        resp.code = 14; resp.message = "Login required.";
+        return res.json(resp);
+    }
+    const { portId, stationName, portName, dateTime } = req.body;
+    if (!portId || !dateTime) {
+        resp.code = 1; resp.message = "Missing parameters.";
+        return res.json(resp);
+    }
+
+    // Set port status to Reserved in DB
+    await cpModel.updateStatus(portId, 'Reserved');
+
+    if (!slotBookings.has(userId)) slotBookings.set(userId, []);
+    const booking = {
+        bookingId: Math.floor(100000 + Math.random() * 900000),
+        portId,
+        stationName: stationName || "Station Hub",
+        portName: portName || "Charger Port",
+        dateTime,
+        status: 'Booked'
+    };
+    slotBookings.get(userId).push(booking);
+
+    resp.code = 0;
+    resp.message = "Booking confirmed!";
+    resp.data = booking;
+    res.json(resp);
+};
+
+const cancelBooking = async (req, res) => {
+    const userId = getUserIdFromToken(req);
+    const resp = new ApiResponse();
+    if (!userId) {
+        resp.code = 14; resp.message = "Login required.";
+        return res.json(resp);
+    }
+    const { bookingId } = req.body;
+    if (!bookingId) {
+        resp.code = 1; resp.message = "Missing booking ID.";
+        return res.json(resp);
+    }
+    const bookings = slotBookings.get(userId) || [];
+    const bookingIndex = bookings.findIndex(b => b.bookingId == bookingId);
+    if (bookingIndex === -1) {
+        resp.code = 4; resp.message = "Booking not found.";
+        return res.json(resp);
+    }
+
+    const booking = bookings[bookingIndex];
+    booking.status = 'Cancelled';
+
+    // Set port status back to Active (Available) in DB
+    await cpModel.updateStatus(booking.portId, 'Active');
+
+    resp.code = 0;
+    resp.message = "Booking cancelled successfully.";
+    resp.data = booking;
+    res.json(resp);
+};
+
+const startChargingSession = (req, res) => {
+    const userId = getUserIdFromToken(req);
+    const resp = new ApiResponse();
+    if (!userId) {
+        resp.code = 14; resp.message = "Login required.";
+        return res.json(resp);
+    }
+    const { vehicleId, portId, startPercent, targetPercent } = req.body;
+    if (!portId) {
+        resp.code = 1; resp.message = "Port ID required.";
+        return res.json(resp);
+    }
+
+    const session = simulator.startSession(userId, vehicleId, portId, startPercent, targetPercent);
+    resp.code = 0;
+    resp.message = "Charging session started successfully!";
+    resp.data = session;
+    res.json(resp);
+};
+
+const stopChargingSession = async (req, res) => {
+    const userId = getUserIdFromToken(req);
+    const resp = new ApiResponse();
+    if (!userId) {
+        resp.code = 14; resp.message = "Login required.";
+        return res.json(resp);
+    }
+
+    const session = await simulator.stopSession(userId);
+    if (!session) {
+        resp.code = 4; resp.message = "No active session found.";
+        return res.json(resp);
+    }
+
+    // Deduct cost from wallet
+    const finalCost = Math.round(session.accumulatedCost * 100) / 100;
+    const currentBal = walletBalances.get(userId) || 0;
+    const newBal = Math.max(0, currentBal - finalCost);
+    walletBalances.set(userId, newBal);
+
+    // Record wallet transaction
+    if (!walletTransactions.has(userId)) walletTransactions.set(userId, []);
+    walletTransactions.get(userId).push({
+        date: new Date().toLocaleString(),
+        type: 'Debit',
+        amount: finalCost,
+        desc: `EV Charging Session #${session.portId}`
+    });
+
+    resp.code = 0;
+    resp.message = "Charging session stopped successfully!";
+    resp.data = {
+        session,
+        finalCost,
+        remainingBalance: newBal
+    };
+    res.json(resp);
+};
+
+const getActiveSession = (req, res) => {
+    const userId = getUserIdFromToken(req);
+    const resp = new ApiResponse();
+    if (!userId) {
+        resp.code = 14; resp.message = "Login required.";
+        return res.json(resp);
+    }
+
+    const session = simulator.getSession(userId);
+    resp.code = 0;
+    resp.message = "ok";
+    resp.data = session || null;
+    res.json(resp);
+};
+
 module.exports = {
     getUser,
     getUserName,
@@ -539,5 +827,13 @@ module.exports = {
     getCPort,
     getAllCTypes,
     getAllUserVehicles,
-    search
+    search,
+    getWallet,
+    rechargeWallet,
+    getBookings,
+    addBooking,
+    cancelBooking,
+    startChargingSession,
+    stopChargingSession,
+    getActiveSession
 };

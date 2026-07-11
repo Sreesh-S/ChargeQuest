@@ -1,22 +1,29 @@
-nav.navbar.navbar-expand-lg.bg-body-tertiary
+nav.navbar.navbar-expand-lg.navbar-glass.navbar-dark.navbar-desktop.mb-4
     .container
-        a.navbar-brand(href="/admin/index") 
-            img(src="/media/applogo.svg")
-            b ChargeQuest
+        a.navbar-brand(href="/user/index") 
+            img(src="/media/applogo.svg" alt="logo" style="width:36px;")
+            span ChargeQuest
         button.navbar-toggler(aria-label="Toggle navigation" aria-expanded="false" aria-controls="navbarSupportedContent" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button")
             span.navbar-toggler-icon
         #navbarSupportedContent.collapse.navbar-collapse
             ul.navbar-nav.ms-auto.mb-2.mb-lg-0
                 li.nav-item
-                    a.nav-link.active(href="/user/index" aria-current="page") Home
+                    a.nav-link(href="/user/index") Home
                 li.nav-item
                     a.nav-link(href="/user/vehicles") Vehicles
                 li.nav-item.dropdown
-                    a.nav-link.dropdown-toggle(aria-expanded="false" data-bs-toggle="dropdown" role="button" href="#") User
-                    ul.dropdown-menu
-                        li
-                            a.dropdown-item(href="#") Account Settings
-                        li
-                            hr.dropdown-divider
+                    a.nav-link.dropdown-toggle(aria-expanded="false" data-bs-toggle="dropdown" role="button" href="#") Account
+                    ul.dropdown-menu.dropdown-menu-dark
                         li
                             a.dropdown-item(href="/user/logout") Logout
+
+.mobile-bottom-nav
+    a.mobile-nav-item(href="/user/index")
+        i.fa.fa-map-o
+        span Explore
+    a.mobile-nav-item(href="/user/vehicles")
+        i.fa.fa-car
+        span Garage
+    a.mobile-nav-item(href="/user/logout")
+        i.fa.fa-sign-out
+        span Logout

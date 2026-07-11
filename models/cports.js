@@ -158,6 +158,36 @@ const update = async (cpid, name, ctid, status) => {
     }
 };
 
+const updateStatus = async (cpid, status) => {
+    var resp = new ApiResponse();
+    try {
+        const dbcfg = new dbconfig();
+        const connection = await mysql.createConnection({
+            user: dbcfg.user,
+            password: dbcfg.password,
+            database: dbcfg.schema,
+            host: dbcfg.host
+        });
+
+        await connection.execute("UPDATE `tbl_chargingports` SET `chargingport_status` = ? WHERE `chargingport_id` = ?;", [ status, cpid ]);
+        
+        resp.code = 0;
+        resp.message = 'Port status updated!';
+        resp.data = null;
+
+        await connection.end();
+        return resp;
+    }
+    catch (error) {
+        console.error('Error updating port status:', error);
+        resp.code = 15;
+        resp.message = error.message;
+        resp.data = error.stack;
+
+        return resp;
+    }
+};
+
 const remove = async (cpid) => {
     var resp = new ApiResponse();
     try {
@@ -194,5 +224,6 @@ module.exports = {
     checkDuplicate,
     create,
     update,
+    updateStatus,
     remove
 };

@@ -3,37 +3,110 @@ html(lang="en")
     head
         meta(charset="utf-8")
         meta(content="width=device-width, initial-scale=1" name="viewport")
-        title ChargeQuest - Admin Dashboard
+        title ChargeQuest - Admin Console
         link(rel="stylesheet" href="/bootstrap/css/bootstrap.min.css")
-        link(rel="stylesheet" 
-            href="/fonts/fonts.css")
-        link(rel="stylesheet" 
-            href="/fonts/materialdesignicons.min.css")
-        link(rel="stylesheet" 
-            href="/FA4/css/font-awesome.min.css")
-        link(rel="stylesheet" 
-            href="/custom/css/common.css")
-        link(rel="stylesheet" 
-            href="/custom/css/admin_index.css")
-    body.position-relative
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+        link(rel="stylesheet" href="/custom/css/common.css")
+        script(src="https://cdn.jsdelivr.net/npm/chart.js")
+    
+    body
         span#resp.hidden= resp
 
         include include/admin_navbar.pug
 
-        .container 
-            .row 
-                .col-lg-6 
-                    .card.bg-success.text-white.mt-5
-                        .card-body 
-                            h1 3
-                            h5 Users
-                            button.btn.btn-light.w-100.mt-5 View
-                .col-lg-6 
-                    .card.bg-danger.text-white.mt-5
-                        .card-body 
-                            h1 3
-                            h5 Charging stations
-                            button.btn.btn-light.w-100.mt-5 View
+        .container.mb-5
+            .row.mb-4
+                .col-12
+                    .glass-card.p-4.d-flex.justify-content-between.align-items-center
+                        div
+                            h2.mb-1 Dashboard Analytics
+                            p.text-muted.mb-0 EV Grid Operations Control Room
+                        span.badge.bg-success.badge-live Live Grid Feed
+
+            // Stats Cards Row
+            .row.g-3.mb-4
+                .col-md-3.col-sm-6
+                    .glass-card.p-3
+                        .widget-stat
+                            div
+                                .text-muted.small.text-uppercase.fw-bold Registered Drivers
+                                .widget-val#valUsers 0
+                            .widget-icon.text-success
+                                i.fa-solid.fa-users
+                        .mt-2.small.text-success
+                            i.fa-solid.fa-arrow-up.me-1
+                            | +12% from last week
+                
+                .col-md-3.col-sm-6
+                    .glass-card.p-3
+                        .widget-stat
+                            div
+                                .text-muted.small.text-uppercase.fw-bold Active Stations
+                                .widget-val#valStations 0
+                            .widget-icon.text-cyan
+                                i.fa-solid.fa-charging-station
+                        .mt-2.small.text-muted
+                            | 100% operational rate
+                            
+                .col-md-3.col-sm-6
+                    .glass-card.p-3
+                        .widget-stat
+                            div
+                                .text-muted.small.text-uppercase.fw-bold Total Revenue
+                                .widget-val#valRevenue ₹12,480
+                            .widget-icon.text-warning
+                                i.fa-solid.fa-wallet
+                        .mt-2.small.text-success
+                            i.fa-solid.fa-arrow-up.me-1
+                            | +18.4% today
+                            
+                .col-md-3.col-sm-6
+                    .glass-card.p-3
+                        .widget-stat
+                            div
+                                .text-muted.small.text-uppercase.fw-bold Current Grid Load
+                                .widget-val#valLoad 170 kW
+                            .widget-icon.text-danger
+                                i.fa-solid.fa-bolt
+                        .mt-2.small.text-warning
+                            | Peak usage alert
+
+            // Analytics Charts Row
+            .row.g-4.mb-4
+                .col-lg-8.col-12
+                    .glass-card.p-4
+                        h5.mb-4 Grid Demand & Power Output (kWh)
+                        div(style="height: 300px; position: relative;")
+                            canvas#demandChart
+                
+                .col-lg-4.col-12
+                    .glass-card.p-4
+                        h5.mb-4 Port Status Distribution
+                        div(style="height: 300px; position: relative; display: flex; justify-content: center; align-items: center;")
+                            canvas#statusChart
+
+            // Quick Actions Row
+            .row.g-3
+                .col-md-4
+                    .glass-card.p-4.text-center
+                        i.fa-solid.fa-charging-station.text-success.fs-2.mb-3
+                        h5 Station Control Room
+                        p.text-muted.small Manage charging terminals, edit locations, map geo-positions.
+                        a.btn.btn-secondary.btn-sm.w-100(href="/admin/cstations") Manage Stations
+                
+                .col-md-4
+                    .glass-card.p-4.text-center
+                        i.fa-solid.fa-users-gear.text-primary.fs-2.mb-3
+                        h5 User Accounts Registry
+                        p.text-muted.small Monitor registered drivers, adjust billing terms, suspend accounts.
+                        a.btn.btn-secondary.btn-sm.w-100(href="/admin/users") Manage Users
+                
+                .col-md-4
+                    .glass-card.p-4.text-center
+                        i.fa-solid.fa-gears.text-warning.fs-2.mb-3
+                        h5 System Preferences
+                        p.text-muted.small Update pricing plans, add connector standards, configure dynamic rates.
+                        a.btn.btn-secondary.btn-sm.w-100(href="/admin/ctypes") Manage Connector Types
 
         include include/footer.pug
         

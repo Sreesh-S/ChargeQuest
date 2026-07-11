@@ -154,33 +154,33 @@ function fillCSList() {
     }
 }
 
-var map, Marker1;
+var map, marker;
 
 function initMap1() {
-    map = new mappls.Map('map', {
-        center: [9.5805097, 76.537262],
-        zoomControl: true,
-        location: true
-    });
-    Marker1 = new mappls.Marker({
-        map: map,
-        position: {
-            "lat": 9.5805097,
-            "lng": 76.537262
-        },
-        fitbounds: true,
-        icon_url: 'https://apis.mapmyindia.com/map_v3/1.png'
-    });
+    map = L.map('map').setView([9.5805097, 76.537262], 13);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CartoDB'
+    }).addTo(map);
+
+    marker = L.marker([9.5805097, 76.537262]).addTo(map);
 
     map.on('click', function (event) {
-        document.getElementById('hdnLocInfo').value = JSON.stringify(event.lngLat);
-        //$("#tbLong").val(event.lngLat.lng);
-        console.log('Location picked: ', JSON.stringify(event.lngLat));
-        //alert(JSON.stringify(event.lngLat));
-        $("#tbLat").val(event.lngLat.lat);
-        $("#tbEditLat").val(event.lngLat.lat);
-        $("#tbLong").val(event.lngLat.lng);
-        $("#tbEditLong").val(event.lngLat.lng);
+        document.getElementById('hdnLocInfo').value = JSON.stringify(event.latlng);
+        $("#tbLat").val(event.latlng.lat);
+        $("#tbEditLat").val(event.latlng.lat);
+        $("#tbLong").val(event.latlng.lng);
+        $("#tbEditLong").val(event.latlng.lng);
+
+        marker.setLatLng(event.latlng);
+
+        var locobj = { lat: event.latlng.lat, long: event.latlng.lng };
+        $("#hdnLoc").val(JSON.stringify(locobj));
+    });
+
+    // Fix map rendering bug inside Bootstrap modal
+    $('#LocPickerModal').on('shown.bs.modal', function () {
+        map.invalidateSize();
     });
 }
 
@@ -213,4 +213,5 @@ $(document).ready(function () {
     }
 
     fillCSList();
+    initMap1();
 });
